@@ -30,8 +30,8 @@ target_compile_definitions(polynomial_kit PRIVATE "POLYNOMIAL_KIT_BUILDING_LIBRA
 target_include_directories(polynomial_kit PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
-ament_target_dependencies(polynomial_kit
-  Eigen3)
+target_link_libraries(polynomial_kit
+  Eigen3::Eigen)
 
 # Libraries installation
 install(
