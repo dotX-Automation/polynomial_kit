@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 project(polynomial_kit)
 
 set(CMAKE_BUILD_TYPE "RelWithDebInfo")
@@ -19,19 +19,19 @@ endif()
 
 # Find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(Eigen3 3.4 REQUIRED NO_MODULE)
+find_package(eigen3_cmake_module REQUIRED)
+find_package(Eigen3 3.4 REQUIRED)
 
 # Dynamic systems base library configuration
-add_library(polynomial_kit SHARED
-  src/polynomial_kit/polynomial.cpp)
+add_library(polynomial_kit SHARED src/polynomial_kit/polynomial.cpp)
+add_library(polynomial_kit::polynomial_kit ALIAS polynomial_kit)
 target_compile_features(polynomial_kit PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 target_compile_definitions(polynomial_kit PRIVATE "POLYNOMIAL_KIT_BUILDING_LIBRARY")
 target_include_directories(polynomial_kit PUBLIC
-  ${EIGEN3_INCLUDE_DIR}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_link_libraries(polynomial_kit
-  Eigen3::Eigen)
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
+ament_target_dependencies(polynomial_kit
+  Eigen3)
 
 # Libraries installation
 install(
@@ -39,7 +39,7 @@ install(
   DESTINATION include)
 install(
   TARGETS polynomial_kit
-  EXPORT polynomial_kitTargets
+  EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -58,6 +58,8 @@ if(BUILD_TESTING)
 endif()
 
 # Export all dependencies and library targets for this package
-ament_export_targets(polynomial_kitTargets HAS_LIBRARY_TARGET)
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_dependencies(eigen3_cmake_module)
+ament_export_dependencies(Eigen3)
 
 ament_package()
